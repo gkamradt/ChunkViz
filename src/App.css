@@ -50,3 +50,7 @@
 textarea {
   margin: 20px;
 }
+
+.overlap {
+  background-color: #90a955; /* or any other color you choose for overlaps */
+}
