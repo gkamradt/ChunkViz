@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  margin: 20px;
 }
 
 .App-logo {
@@ -35,4 +36,17 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.chunked-text {
+  white-space: pre-wrap; /* Keeps whitespace and newlines */
+  font-family: monospace;
+  width: 50%;
+  margin: 0 auto;
+  text-align: center;
+  padding-top: 30px;
+}
+
+textarea {
+  margin: 20px;
 }
