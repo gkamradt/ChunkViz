@@ -63,6 +63,13 @@ textarea {
   align-items: center;
 }
 
+#info_box {
+  width: 75%;
+  align-items: center;
+  margin: 0 auto; /* This will center the div horizontally */
+  justify-content: center; /* This will center the div's content horizontally */
+}
+
 @media (max-width: 600px) {
   .slider-container {
     flex-direction: column;
@@ -75,5 +82,12 @@ textarea {
   textarea {
     margin: 20px;
     width: 80%
+  }
+
+  #info_box {
+    width: 85%;
+    align-items: center;
+    margin: 0 auto; /* This will center the div horizontally */
+    justify-content: center; /* This will center the div's content horizontally */
   }
 }
