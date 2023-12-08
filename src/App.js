@@ -242,13 +242,13 @@ function App() {
         </div>
         <div className="slider-container">
           <label>
-            Chunk Size {chunkSize}:
+          <span style={{ display: 'inline-block', minWidth: '125px' }}>Chunk Size {chunkSize}:</span>
             <input type="range" min="1" max="2000" value={chunkSize} onChange={handleChunkSizeChange} />
           </label>
         </div>
         <div className="slider-container">
           <label style={{ opacity: splitterOptions[splitter].chunk_overlap_ind ? 1 : 0.5 }}>
-            Chunk Overlap {overlap}:
+          <span style={{ display: 'inline-block', minWidth: '150px' }}>Chunk Overlap {overlap}:</span>
             <input type="range" min="0" max={overlapSize} value={overlap} onChange={handleOverlapChange} disabled={!splitterOptions[splitter].chunk_overlap_ind} />
           </label>
         </div>
