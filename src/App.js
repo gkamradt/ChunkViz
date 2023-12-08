@@ -230,7 +230,7 @@ function App() {
     <div className="App">
       <h1>ChunkViz v0.1</h1>
       <p>Language Models do better when they're focused.</p>
-      <p>One strategy is to pass a relevant subset (chunk) your full data. There are many ways to chunk text.</p>
+      <p>One strategy is to pass a relevant subset (chunk) of your full data. There are many ways to chunk text.</p>
       <p>This is an tool to understand different chunking/splitting strategies.</p>
       <p><a href='#explanation'>Explain like I'm 5...</a></p>
       <textarea value={text} onChange={handleTextChange} rows={10} cols={50} />
@@ -297,7 +297,7 @@ function App() {
       <hr style={{ width: '75%', marginTop: '15px' }} />
       <div id='info_box'>
         <h3 id="explanation">What's going on here?</h3>
-        <p>Language Models have context windows. This is the lenght of text that they can process in a single pass.<br /> Although context lengths are getting larger, it has been shown that language models increase performance on tasks when they are given less (but more relevant) information.</p>
+        <p>Language Models have context windows. This is the length of text that they can process in a single pass.<br /> Although context lengths are getting larger, it has been shown that language models increase performance on tasks when they are given less (but more relevant) information.</p>
         <p>But which relevant subset of data do you pick? This is easy when a human is doing it by hand, but turns out it is difficult to instruct a computer to do this.</p>
         <p>One common way to do this is by chunking, or subsetting, your large data into smaller pieces. In order to do this you need to pick a chunk strategy.</p>
         <p>Pick different chunking strategies above to see how they impact the text, add your own text if you'd like.</p>
