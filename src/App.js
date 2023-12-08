@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import './App.css';
 import { defaultProse, defaultJS, defaultPython, defaultMarkdown } from './defaultText.js';
 import { CharacterTextSplitter, RecursiveCharacterTextSplitter } from "langchain/text_splitter";
@@ -17,6 +17,39 @@ class CharacterTextSplitter_ext extends CharacterTextSplitter {
   }
 }
 
+const highlightChunks = (chunks) => {
+  let highlightedText = '';
+  const colors = ['#70d6ff', '#e9ff70', '#ff9770', '#ffd670', '#ff70a6'];
+
+  console.log("Processed Chunks", chunks);
+  chunks.forEach((chunk, index) => {
+    let uniquePart, overlapPart;
+
+    if (index === 0) {
+      uniquePart = chunk.text.slice(0, chunk.text.length - chunk.overlapWithNext);
+      overlapPart = chunk.text.slice(chunk.text.length - chunk.overlapWithNext);
+    } else if (index !== chunks.length - 1) {
+      uniquePart = chunk.text.slice(chunk.overlapWithNext, chunk.text.length - chunk.overlapWithNext);
+      overlapPart = chunk.text.slice(chunk.text.length - chunk.overlapWithNext, chunk.text.overlapWithNext);
+    } else { // It's the last chunk
+      uniquePart = chunk.text.slice(chunk.overlapWithNext);
+      overlapPart = ''; // There's no overlap with the next chunk
+    }
+
+    // Generate a pseudo-random color for each unique part using HSL
+    const color = colors[index % colors.length];
+
+    const highlightedChunk = `<span style="background: ${color}">${uniquePart}</span>`;
+    highlightedText += highlightedChunk;
+
+    // Add overlap part only if it's not the last chunk
+    if (overlapPart) {
+      highlightedText += `<span class="overlap">${overlapPart}</span>`;
+    }
+  });
+  return highlightedText;
+};
+
 function App() {
   const [text, setText] = useState(defaultProse);
   const [chunkSize, setChunkSize] = useState(25);
@@ -25,10 +58,9 @@ function App() {
   const [splitter, setSplitter] = useState('characterSplitter');
   const [rawChunks, setRawChunks] = useState([]);
 
-  const colors = ['#70d6ff', '#e9ff70', '#ff9770', '#ffd670', '#ff70a6'];
   const MAX_TEXT_LENGTH = 100000; // Define your maximum text length
 
-  const splitterOptions = {
+  const splitterOptions = useMemo(() => ({
     'characterSplitter': {
       label: 'Character Splitter 🦜️🔗',
       language: null,
@@ -59,7 +91,7 @@ function App() {
       chunk_overlap_ind: false,
       defaultText: defaultMarkdown
     },
-  };
+  }), []);
 
   useEffect(() => {
     if (!splitterOptions[splitter].chunk_overlap_ind) {
@@ -74,13 +106,6 @@ function App() {
       setText(splitterOptions[splitter].defaultText); // Set the default text for the selected splitter
     }
   }, [splitter, text, splitterOptions]);
-
-  useEffect(() => {
-    (async () => {
-      const result = await renderTextWithHighlights();
-      setHighlightedText(result);
-    })();
-  }, [text, chunkSize, overlap, splitter]);
 
   const handleTextChange = (event) => {
     let newText = event.target.value;
@@ -131,37 +156,6 @@ function App() {
     return chunkData;
   };
 
-  const highlightChunks = (chunks) => {
-    let highlightedText = '';
-    console.log("Processed Chunks", chunks);
-    chunks.forEach((chunk, index) => {
-      let uniquePart, overlapPart;
-
-      if (index === 0) {
-        uniquePart = chunk.text.slice(0, chunk.text.length - chunk.overlapWithNext);
-        overlapPart = chunk.text.slice(chunk.text.length - chunk.overlapWithNext);
-      } else if (index !== chunks.length - 1) {
-        uniquePart = chunk.text.slice(chunk.overlapWithNext, chunk.text.length - chunk.overlapWithNext);
-        overlapPart = chunk.text.slice(chunk.text.length - chunk.overlapWithNext, chunk.text.overlapWithNext);
-      } else { // It's the last chunk
-        uniquePart = chunk.text.slice(chunk.overlapWithNext);
-        overlapPart = ''; // There's no overlap with the next chunk
-      }
-
-      // Generate a pseudo-random color for each unique part using HSL
-      const color = colors[index % colors.length];
-
-      const highlightedChunk = `<span style="background: ${color}">${uniquePart}</span>`;
-      highlightedText += highlightedChunk;
-
-      // Add overlap part only if it's not the last chunk
-      if (overlapPart) {
-        highlightedText += `<span class="overlap">${overlapPart}</span>`;
-      }
-    });
-    return highlightedText;
-  };
-
   const chunkTextSimple = async (text, chunkSize, overlap) => {
     const splitter = new CharacterTextSplitter_ext({
       separator: "",
@@ -205,7 +199,7 @@ function App() {
     return chunks;
   };
 
-  const renderTextWithHighlights = async () => {
+  const renderTextWithHighlights = useCallback(async () => {
     let rawChunks;
     const language = splitterOptions[splitter].language;
     if (splitter.startsWith('characterSplitter')) {
@@ -218,7 +212,14 @@ function App() {
     const reconstructedChunks = reconstructChunks(rawChunks, overlap);
     const highlightedText = highlightChunks(reconstructedChunks);
     return highlightedText;
-  };
+  }, [text, chunkSize, overlap, splitter, splitterOptions]);
+
+  useEffect(() => {
+    (async () => {
+      const result = await renderTextWithHighlights();
+      setHighlightedText(result);
+    })();
+  }, [renderTextWithHighlights]);
 
   console.log(chunkSize)
 
