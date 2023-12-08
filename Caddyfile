@@ -1,0 +1,27 @@
+{
+  admin off
+  persist_config off
+  auto_https off
+  log {
+    format json
+  }
+  servers {
+    trusted_proxies static private_ranges
+  }
+}
+
+:{$PORT} {
+  log {
+    format json
+  }
+
+  respond /health 200
+
+  root * /path/to/your/build/directory
+
+  encode gzip
+
+  file_server
+
+  try_files {path} /index.html
+}

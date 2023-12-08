@@ -1,0 +1,27 @@
+# https://nixpacks.com/docs/configuration/file
+
+# set up some variables to minimize annoyance
+[variables]
+    NPM_CONFIG_UPDATE_NOTIFIER = 'false' # the update notification is relatively useless in a production environment
+    NPM_CONFIG_FUND = 'false' # the fund notification is also pretty useless in a production environment
+    CADDY_VERSION = '2.7.5' # specify the caddy version to use here, without a 'v' prefix. https://github.com/caddyserver/caddy/releases
+
+# download and untar caddy
+[phases.caddy]
+    dependsOn = ['setup'] # make sure this phase runs after the default 'setup' phase
+    cmds = [
+        'curl -fsSLo caddy.tar.gz "https://github.com/caddyserver/caddy/releases/download/v${CADDY_VERSION}/caddy_${CADDY_VERSION}_linux_amd64.tar.gz"', # download the caddy release specified by 'CADDY_VERSION' from GitHub
+        'tar -zxvf caddy.tar.gz caddy', # only extract 'caddy' from the tarball
+        'chmod +x caddy' # enable file execution for caddy, needed to execute downloaded files
+    ]
+
+# format the Caddyfile with fmt
+[phases.fmt]
+    dependsOn = ['caddy'] # make sure this phase runs after the 'caddy' phase so that we know we have caddy downloaded
+    cmds = ['caddy fmt --overwrite Caddyfile'] # format the Caddyfile to fix any formatting inconsistencies
+
+# copy caddy and build artifacts to a new image and start the caddy web server
+[start]
+    runImage = 'ubuntu:20.04' # use a new ubuntu image to run the caddy server in
+    onlyIncludeFiles = ['caddy', 'Caddyfile', 'build'] # copy only the needed files and folders into the new image (react-scripts builds to a 'build' folder)
+    cmd = './caddy run --config Caddyfile --adapter caddyfile 2>&1' # start caddy using the Caddyfile config and caddyfile adapter
