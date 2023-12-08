@@ -1,27 +1,37 @@
+# global options
 {
-  admin off
-  persist_config off
-  auto_https off
-  log {
-    format json
-  }
-  servers {
-    trusted_proxies static private_ranges
-  }
+	admin off # theres no need for the admin api in railway's environment
+	persist_config off # storage isn't persistent anyway
+	auto_https off # railway handles https for us, this would cause issues if left enabled
+	# runtime logs
+	log {
+		format json # set runtime log format to json mode 
+	}
+	# server options
+	servers {
+		trusted_proxies static private_ranges # trust railway's proxy
+	}
 }
 
+# site block, listens on the $PORT environment variable, automatically assigned by railway
 :{$PORT} {
-  log {
-    format json
-  }
+	# access logs
+	log {
+		format json # set access log format to json mode
+	}
 
-  respond /health 200
+	# health check for railway
+	respond /health 200
 
-  root * /path/to/your/build/directory
+	# serve from the 'build' folder (react-scripts builds into the 'build' folder)
+	root * build
 
-  encode gzip
+	# enable gzipping responses
+	encode gzip
 
-  file_server
+	# serve files from 'build'
+	file_server
 
-  try_files {path} /index.html
+	# if path doesn't exist, redirect it to 'index.html' for client side routing
+	try_files {path} /index.html
 }

@@ -4,7 +4,7 @@
 [variables]
     NPM_CONFIG_UPDATE_NOTIFIER = 'false' # the update notification is relatively useless in a production environment
     NPM_CONFIG_FUND = 'false' # the fund notification is also pretty useless in a production environment
-    CADDY_VERSION = '2.7.5' # specify the caddy version to use here, without a 'v' prefix. https://github.com/caddyserver/caddy/releases
+    CADDY_VERSION = '2.7.6' # specify the caddy version to use here, without a 'v' prefix. https://github.com/caddyserver/caddy/releases
 
 # download and untar caddy
 [phases.caddy]
