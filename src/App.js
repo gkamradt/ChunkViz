@@ -104,7 +104,7 @@ function App() {
     const defaultTexts = Object.values(splitterOptions).map(option => option.defaultText) || [];
 
     // Check if the current text is blank or a default text
-    if (text === '' || defaultTexts.includes(text)) {
+    if (defaultTexts.includes(text)) {
       setText(splitterOptions[splitter].defaultText); // Set the default text for the selected splitter
     }
   }, [splitter, text, splitterOptions]);
@@ -158,6 +158,9 @@ function App() {
   };
 
   const chunkTextSimple = async (text, chunkSize, overlap) => {
+    if (!text) {
+      return [];
+    }
     const splitter = new CharacterTextSplitter_ext({
       separator: "",
       chunkSize: chunkSize,
@@ -175,6 +178,9 @@ function App() {
   };
 
   const chunkTextRecursive = async (text, chunkSize, overlap, language) => {
+    if (!text) {
+      return [];
+    }
     let splitter;
     if (language) {
       splitter = RecursiveCharacterTextSplitter_ext.fromLanguage(language, {
