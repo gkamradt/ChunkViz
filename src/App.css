@@ -49,8 +49,31 @@
 
 textarea {
   margin: 20px;
+  width: 50%
 }
 
 .overlap {
   background-color: #90a955; /* or any other color you choose for overlaps */
+}
+
+.slider-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  .slider-container {
+    flex-direction: column;
+  }
+
+  .chunked-text {
+    width: 80%;
+  }
+
+  textarea {
+    margin: 20px;
+    width: 80%
+  }
 }

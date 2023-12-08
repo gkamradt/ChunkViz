@@ -6,6 +6,7 @@ import { CharacterTextSplitter, RecursiveCharacterTextSplitter } from "langchain
 class RecursiveCharacterTextSplitter_ext extends RecursiveCharacterTextSplitter {
   joinDocs(docs, separator) {
     // LangChain trims chunks, we don't want that for visuals!
+    // Hacky override
     return docs.join(separator);
   }
 }
@@ -13,6 +14,7 @@ class RecursiveCharacterTextSplitter_ext extends RecursiveCharacterTextSplitter 
 class CharacterTextSplitter_ext extends CharacterTextSplitter {
   joinDocs(docs, separator) {
     // LangChain trims chunks, we don't want that for visuals!
+    // Hacky override
     return docs.join(separator);
   }
 }
@@ -21,7 +23,6 @@ const highlightChunks = (chunks) => {
   let highlightedText = '';
   const colors = ['#70d6ff', '#e9ff70', '#ff9770', '#ffd670', '#ff70a6'];
 
-  console.log("Processed Chunks", chunks);
   chunks.forEach((chunk, index) => {
     let uniquePart, overlapPart;
 
@@ -53,10 +54,11 @@ const highlightChunks = (chunks) => {
 function App() {
   const [text, setText] = useState(defaultProse);
   const [chunkSize, setChunkSize] = useState(25);
-  const [overlap, setOverlap] = useState(4);
+  const [overlap, setOverlap] = useState(0);
   const [highlightedText, setHighlightedText] = useState('');
   const [splitter, setSplitter] = useState('characterSplitter');
   const [rawChunks, setRawChunks] = useState([]);
+  const [overlapSize, setOverlapSize] = useState([]);
 
   const MAX_TEXT_LENGTH = 100000; // Define your maximum text length
 
@@ -120,6 +122,7 @@ function App() {
     let newChunkSize = Number(event.target.value);
     if (newChunkSize > overlap * 2) {
       setChunkSize(newChunkSize);
+      setOverlapSize(newChunkSize*.45)
     }
   };
 
@@ -151,8 +154,6 @@ function App() {
 
       currentStartIndex = endIndex - (isLastChunk ? 0 : chunkOverlap); // Adjusted current start index
     });
-
-
     return chunkData;
   };
 
@@ -182,7 +183,6 @@ function App() {
         keepSeparator: true
       });
     } else {
-      console.log("regular recurssive", chunkSize, overlap)
       splitter = new RecursiveCharacterTextSplitter_ext({
         chunkSize: chunkSize,
         chunkOverlap: overlap,
@@ -207,7 +207,6 @@ function App() {
     } else {
       rawChunks = await chunkTextRecursive(text, chunkSize, overlap, language);
     }
-    console.log("Raw Chunks From LangChain", rawChunks)
     setRawChunks(rawChunks); // Set the state variable
     const reconstructedChunks = reconstructChunks(rawChunks, overlap);
     const highlightedText = highlightChunks(reconstructedChunks);
@@ -221,13 +220,14 @@ function App() {
     })();
   }, [renderTextWithHighlights]);
 
-  console.log(chunkSize)
-
   return (
     <div className="App">
       <h1>ChunkViz v0.1</h1>
-      <p>This is an exploratory tool to visualize how common text splitters work</p>
-      <p>For implementations of text splitters, view LangChain (py, js) & Llama Index (py, js)</p>
+      <p>This is an exploratory visualization tool to understand different ways to split text.</p>
+      <p>For implementations of text splitters, view LangChain
+        (<a href="https://python.langchain.com/docs/modules/data_connection/document_transformers/text_splitters/character_text_splitter" target="_blank" rel="noopener noreferrer">py</a>, <a href="https://js.langchain.com/docs/modules/data_connection/document_transformers/text_splitters/character_text_splitter" target="_blank" rel="noopener noreferrer">js</a>) & Llama Index (<a href="https://docs.llamaindex.ai/en/stable/api/llama_index.node_parser.SentenceSplitter.html#llama_index.node_parser.SentenceSplitter" target="_blank" rel="noopener noreferrer">py</a>, <a href="https://ts.llamaindex.ai/modules/low_level/node_parser" target="_blank" rel="noopener noreferrer">js</a>)</p>
+      <p><b>Chunk Size</b>: The length (in characters) of your end chunks</p>
+      <p><b>Chunk Overlap (Green)</b>: The amount of overlap or cross over sequential chunks share</p>
       <textarea value={text} onChange={handleTextChange} rows={10} cols={50} />
       <div>
         <div>
@@ -240,14 +240,18 @@ function App() {
             </select>
           </label>
         </div>
-        <label>
-          Chunk Size {chunkSize}:
-          <input type="range" min="1" max="2000" value={chunkSize} onChange={handleChunkSizeChange} />
-        </label>
-        <label>
-          Overlap {overlap}:
-          <input type="range" min="0" max="200" value={overlap} onChange={handleOverlapChange} disabled={!splitterOptions[splitter].chunk_overlap_ind} />
-        </label>
+        <div className="slider-container">
+          <label>
+            Chunk Size {chunkSize}:
+            <input type="range" min="1" max="2000" value={chunkSize} onChange={handleChunkSizeChange} />
+          </label>
+        </div>
+        <div className="slider-container">
+          <label style={{ opacity: splitterOptions[splitter].chunk_overlap_ind ? 1 : 0.5 }}>
+            Chunk Overlap {overlap}:
+            <input type="range" min="0" max={overlapSize} value={overlap} onChange={handleOverlapChange} disabled={!splitterOptions[splitter].chunk_overlap_ind} />
+          </label>
+        </div>
         <div>
           Total Characters: {rawChunks.reduce((a, b) => a + b.length, 0)}
         </div>
@@ -262,7 +266,7 @@ function App() {
         <div dangerouslySetInnerHTML={{ __html: highlightedText }} />
       </div>
       <p>Made with ❤️ by <a href="https://twitter.com/GregKamradt" target="_blank" rel="noopener noreferrer">Greg Kamradt</a></p>
-      <p><a href="https://github.com/gkamradt" target="_blank" rel="noopener noreferrer">PRs Welcome</a></p>
+      <p><a href="https://github.com/gkamradt/ChunkViz" target="_blank" rel="noopener noreferrer">PRs Welcome</a></p>
     </div>
   );
 }

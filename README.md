@@ -2,7 +2,7 @@
 
 This is a tool to visualize how different text splitters chunk up text
 
-See it here:
+See it here: https://www.chunkviz.com/
 
 Explainer Video: 
 
