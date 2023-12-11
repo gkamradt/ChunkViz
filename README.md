@@ -2,7 +2,7 @@
 
 This is a tool to visualize how different text splitters chunk up text
 
-![ChunkViz Preview](public/ChunkVizPreview.png){:width="500px"}
+![ChunkViz Preview](public/ChunkVizPreview.png)
 
 
 [See the demo](https://www.chunkviz.com/)
