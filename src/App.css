@@ -13,7 +13,15 @@
     animation: App-logo-spin infinite 20s linear;
   }
 }
+.chart-container {
+  display: flex;
+  justify-content: center;
+}
 
+.textarea-container {
+  flex: 1; /* Allows the textarea container to grow */
+  padding-right: 10px; /* Adds some space between the textarea and the chart */
+}
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -49,7 +57,7 @@
 
 textarea {
   margin: 20px;
-  width: 50%
+  width: 50%;
 }
 
 .overlap {
@@ -80,8 +88,8 @@ textarea {
   }
 
   textarea {
-    margin: 20px;
-    width: 80%
+    width: 100%; /* Takes the full width of its parent container */
+    margin: 0; /* Removes margin around the textarea */
   }
 
   #info_box {
