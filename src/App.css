@@ -48,8 +48,18 @@
 }
 
 textarea {
-  margin: 20px;
+  width: 100%;
+  margin-bottom: 3px;
+}
+
+.textArea {
+  margin: 0 auto;
   width: 50%
+}
+
+.uploadButtonArea {
+  text-align: right;
+  /* background-color: blue; */
 }
 
 .overlap {

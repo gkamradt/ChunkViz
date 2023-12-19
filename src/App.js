@@ -133,6 +133,17 @@ function App() {
     }
   };
 
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        setText(e.target.result);
+      };
+      reader.readAsText(file);
+    }
+  };
+
   const reconstructChunks = (chunks, chunkOverlap) => {
     let reconstructedText = [];
     let chunkData = [];
@@ -233,7 +244,15 @@ function App() {
       <p>One strategy is to pass a relevant subset (chunk) of your full data. There are many ways to chunk text.</p>
       <p>This is an tool to understand different chunking/splitting strategies.</p>
       <p><a href='#explanation'>Explain like I'm 5...</a></p>
-      <textarea value={text} onChange={handleTextChange} rows={10} cols={50} />
+      <div className='textArea'>
+        <textarea value={text} onChange={handleTextChange} rows={10} cols={50} />
+        <div className='uploadButtonArea'>
+          <label htmlFor="file-upload" className="custom-file-upload">
+            <span style={{borderRadius: '5px', padding: '5px', fontSize: '12px', backgroundColor: '#d1dcff'}}>Upload .txt</span>
+          </label>
+          <input id="file-upload" type="file" accept=".txt" onChange={handleFileUpload} style={{ display: 'none' }} />
+        </div>
+      </div>
       <div>
         <div>
           <label>
