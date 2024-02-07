@@ -20,7 +20,7 @@ Before you begin, ensure you have [Node.js](https://nodejs.org/) installed on yo
 ### Step 1: Clone the Repository
 
 First, clone the repository to your local machine using the following command:
-`git clone https://github.com/your-username/your-repository-name.git`
+`git clone https://github.com/gkamradt/ChunkViz`
 
 ### Step 2: Install Dependencies
 
