@@ -240,6 +240,8 @@ function App() {
   return (
     <div className="App">
       <h1>ChunkViz v0.1</h1>
+      <p>Want to learn more about AI Engineering Patterns? <a href="https://dub.sh/unstructured_text_chunkviz" target="_blank" rel="noopener noreferrer">Join me live Dec 4th for a workshop.</a></p>
+      <hr style={{width: '50%', margin: 'auto'}} />
       <p>Language Models do better when they're focused.</p>
       <p>One strategy is to pass a relevant subset (chunk) of your full data. There are many ways to chunk text.</p>
       <p>This is an tool to understand different chunking/splitting strategies.</p>
