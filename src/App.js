@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import './App.css';
 import { defaultProse, defaultJS, defaultPython, defaultMarkdown } from './defaultText.js';
 import { CharacterTextSplitter, RecursiveCharacterTextSplitter } from "langchain/text_splitter";
+import { chunkdown } from 'chunkdown';
 
 class RecursiveCharacterTextSplitter_ext extends RecursiveCharacterTextSplitter {
   joinDocs(docs, separator) {
@@ -59,6 +60,7 @@ function App() {
   const [splitter, setSplitter] = useState('characterSplitter');
   const [rawChunks, setRawChunks] = useState([]);
   const [overlapSize, setOverlapSize] = useState([]);
+  const [overflowRatio, setOverflowRatio] = useState(1.0);
 
   const MAX_TEXT_LENGTH = 100000; // Define your maximum text length
 
@@ -93,11 +95,23 @@ function App() {
       chunk_overlap_ind: false,
       defaultText: defaultMarkdown
     },
+    'chunkdownMarkdown': {
+      label: 'Chunkdown - Markdown',
+      language: 'markdown',
+      chunk_overlap_ind: false,
+      overflow_ratio_ind: true,
+      defaultText: defaultMarkdown
+    },
   }), []);
 
   useEffect(() => {
     if (!splitterOptions[splitter].chunk_overlap_ind) {
       setOverlap(0);
+    }
+
+    // Reset overflow ratio to default when switching away from chunkdown
+    if (!splitterOptions[splitter].overflow_ratio_ind) {
+      setOverflowRatio(1.0);
     }
 
     // Get all default texts
@@ -130,6 +144,13 @@ function App() {
     let newOverlap = Number(event.target.value);
     if (newOverlap <= chunkSize * 0.5) {
       setOverlap(newOverlap);
+    }
+  };
+
+  const handleOverflowRatioChange = (event) => {
+    let newOverflowRatio = Number(event.target.value);
+    if (newOverflowRatio >= 1.0 && newOverflowRatio <= 2.0) {
+      setOverflowRatio(newOverflowRatio);
     }
   };
 
@@ -216,11 +237,28 @@ function App() {
     return chunks;
   };
 
+  const chunkTextChunkdown = async (text, chunkSize, overflowRatio) => {
+    if (!text) {
+      return [];
+    }
+    
+    const options = {
+      chunkSize: chunkSize,
+      maxOverflowRatio: overflowRatio
+    };
+    
+    const splitter = chunkdown(options);
+    const chunks = splitter.splitText(text);
+    return chunks;
+  };
+
   const renderTextWithHighlights = useCallback(async () => {
     let rawChunks;
     const language = splitterOptions[splitter].language;
     if (splitter.startsWith('characterSplitter')) {
       rawChunks = await chunkTextSimple(text, chunkSize, overlap);
+    } else if (splitter === 'chunkdownMarkdown') {
+      rawChunks = await chunkTextChunkdown(text, chunkSize, overflowRatio);
     } else {
       rawChunks = await chunkTextRecursive(text, chunkSize, overlap, language);
     }
@@ -228,7 +266,7 @@ function App() {
     const reconstructedChunks = reconstructChunks(rawChunks, overlap);
     const highlightedText = highlightChunks(reconstructedChunks);
     return highlightedText;
-  }, [text, chunkSize, overlap, splitter, splitterOptions]);
+  }, [text, chunkSize, overlap, overflowRatio, splitter, splitterOptions]);
 
   useEffect(() => {
     (async () => {
@@ -302,6 +340,30 @@ function App() {
             />
           </label>
         </div>
+        {splitterOptions[splitter].overflow_ratio_ind && (
+          <div className="slider-container">
+            <label>
+              <span style={{ display: 'inline-block', paddingRight: '10px' }}>Overflow Ratio:</span>
+              <input
+                type="number"
+                min="1.0"
+                max="2.0"
+                step="0.1"
+                value={overflowRatio}
+                style={{ width: '50px' }}
+                onChange={handleOverflowRatioChange}
+              />
+              <input
+                type="range"
+                min="1.0"
+                max="2.0"
+                step="0.1"
+                value={overflowRatio}
+                onChange={handleOverflowRatioChange}
+              />
+            </label>
+          </div>
+        )}
         <div>
           Total Characters: {rawChunks.reduce((a, b) => a + b.length, 0)}
         </div>

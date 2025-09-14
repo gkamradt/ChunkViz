@@ -5,6 +5,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "chunkdown": "^1.2.1",
     "langchain": "^0.0.203",
     "llamaindex": "^0.0.38",
     "pdf-parse": "^1.1.1",
