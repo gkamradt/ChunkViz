@@ -66,6 +66,24 @@ textarea {
   background-color: #90a955; /* or any other color you choose for overlaps */
 }
 
+.splitter-selector {
+  margin: 10px 0;
+}
+
+.splitter-selector select {
+  margin-left: 5px;
+  padding: 3px;
+}
+
+.splitter-description {
+  font-size: 12px;
+  color: #666;
+}
+
+.stats {
+  margin: 10px 0;
+}
+
 .slider-container {
   display: flex;
   flex-direction: row;
